@@ -6,9 +6,9 @@
   import JoystickComponent from "./components/JoystickComponent.vue";
   import LogsComponent from "./components/LogsComponent.vue";
   import ParamsComponent from "./components/ParamsComponent.vue";
-  //import 'bootstrap/dist/css/bootstrap.min.css'
-  //import 'jquery/src/jquery.js'
-  //import 'bootstrap/dist/js/bootstrap.min.js'
+
+  import CallServiceComponent from "./components/CallServiceComponenet.vue";
+
 
 </script>
 
@@ -49,10 +49,27 @@
       <!--Botones-->
       <div class="col-1 button-container">
         <div class="button-column">
-          <ButtonComponent></ButtonComponent>
+          <ButtonComponent
+            ref="ButtonInitLocComponentRef"
+            v:bind:usuario="usuario"
+            :initialState="'inactive'"
+            :buttonTextActive="'Init Localization'"
+            :buttonTextInactive="'Deactivated'"
+            :buttonTextProcessing="'Localizando robot...'"
+            :buttonPublishBT="'init_localization'"
+            >
+        </ButtonComponent>
         </div>
         <div class="button-column">
-          <ButtonComponent></ButtonComponent>
+          <ButtonComponent
+            ref="ButtonFindShelfComponentRef"
+            v:bind:usuario="usuario"
+            :initialState="'inactive'"
+            :buttonTextActive="'Find shelf'"
+            :buttonTextInactive="'Deactivated'"
+            :buttonTextProcessing="'Finding shelf...'"
+            :buttonPublishBT="'find_shelf_and_publish'"
+          ></ButtonComponent>
         </div>
         <div class="button-column">
           <ButtonComponent></ButtonComponent>
@@ -86,6 +103,7 @@ export default {
     JoystickComponent,
     LogsComponent,
     ParamsComponent,
+    CallServiceComponent,
   },
 
   methods: {
@@ -96,6 +114,8 @@ export default {
       this.$refs.JoystickComponentRef.joystickConfig(ros);
       this.$refs.LogsComponentRef.logsInit();
       this.$refs.ParamsComponentRef.paramInit(ros);
+      this.$refs.ButtonInitLocComponentRef.buttonInit(ros);
+      this.$refs.ButtonFindShelfComponentRef.buttonInit(ros);
     },
     config_web_event(config_web) {
       console.log("[Params component] event function");

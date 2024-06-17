@@ -48,7 +48,7 @@ export default {
         width: "75px",
         height: "75px",
       },
-      topic_cmd_vel: "topic_cmd_vel",
+      topic_cmd_vel: "cmd_vel",
     };
   },
 
@@ -66,14 +66,16 @@ export default {
     publishCmdVel: function () {
       let topic = new ROSLIB.Topic({
         ros: this.ros,
-        name: this.topic_name,
+        name: "cmd_vel",
         messageType: "geometry_msgs/msg/Twist",
       });
       let message = new ROSLIB.Message({
         linear: { x: this.joystick.vertical, y: 0, z: 0 },
         angular: { x: 0, y: 0, z: -1 * this.joystick.horizontal },
       });
+      console.log("Publicando mensaje");
       topic.publish(message);
+      
     },
 
     // funciones para el joystick

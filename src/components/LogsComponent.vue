@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  name: "MapComponent",
+  name: "LogsComponent",
   data() {
     return {
       ros: null,

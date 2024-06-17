@@ -9,6 +9,7 @@
 
 <script>
 import ROSLIB from "roslib";
+import robotImageSrc from "@/assets/robot.png"; // Import the image
 
 export default {
   name: "MapComponent",
@@ -25,10 +26,18 @@ export default {
       pubInterval: null,
 
       map: null,
-      context: null,
+
+
+      mapCanvas: null,
+      mapContext: null,
+      mainCanvas: null,
+      mainContext: null,
+
       scale: 5,
       point_last_x: 0,
       point_last_y: 0,
+      robotImage: new Image(), // Initialize the robot image
+
     };
   },
 
@@ -46,6 +55,7 @@ export default {
         this.drawAll(map);
         console.log("Map subscriber");
       });
+      this.robotImage.src = robotImageSrc;
     },
     // amcl_pose subscribe
     amclPose(ros) {
@@ -58,16 +68,18 @@ export default {
       });
       topic.subscribe((message) => {
         console.log("Amcl pose ");
-        this.drawRobot(
-          this.map,
-          this.context,
-          message.pose.pose.position.x,
-          message.pose.pose.position.y
-        );
+        const position = message.pose.pose.position;
+        const orientation = message.pose.pose.orientation;
+        const angle = this.quaternionToAngle(orientation);
+        this.drawRobot(position.x, position.y, angle);
         console.log(message);
       });
     },
-
+    quaternionToAngle(q) {
+      const siny_cosp = 2 * (q.w * q.z + q.x * q.y);
+      const cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
+      return Math.atan2(siny_cosp, cosy_cosp);
+    },
     drawAll(map) {
       this.map = map;
       const width = map.info.width;
@@ -88,15 +100,28 @@ export default {
       console.log("Map origin y");
       console.log(origin_y);
 
-      // Get the canvas and context
-      const canvas = document.getElementById("mapCanvas");
-      const context = canvas.getContext("2d");
-      this.context = context;
+      this.mapCanvas = document.createElement("canvas");
+      this.mapContext = this.mapCanvas.getContext("2d");
 
-      this.drawMap(map, canvas, context);
-      this.drawGrid(map, context);
+      this.mainCanvas = document.getElementById("mapCanvas");
+      this.mainContext = this.mainCanvas.getContext("2d");
+
+      // Set offscreen canvas size
+      this.mapCanvas.width = width * this.scale;
+      this.mapCanvas.height = height * this.scale;
+
+      this.drawMap(map, this.mapContext);
+      this.drawGrid(map, this.mapContext);
+
+      // Set main canvas size
+      this.mainCanvas.width = width * this.scale;
+      this.mainCanvas.height = height * this.scale;
+
+      // Draw the static map and grid on the main canvas
+      this.mainContext.drawImage(this.mapCanvas, 0, 0);
+
     },
-    drawMap(map, canvas, context) {
+    drawMap(map, context) {
       var data = map.data;
 
       const width = map.info.width;
@@ -105,11 +130,6 @@ export default {
       // Initialize data_1 to store reflected data
       const data_1 = new Array(data.length);
 
-      // Set canvas dimensions to the original map dimensions
-      canvas.width = width * this.scale;
-      canvas.height = height * this.scale;
-
-      // Create a new ImageData object
       const imageData = context.createImageData(
         width * this.scale,
         height * this.scale
@@ -173,37 +193,60 @@ export default {
         context.stroke();
       }
     },
-    drawRobot(map, context, point_x, point_y) {
-      const radius = 5; // Radio del punto
-      context.clearRect(
+    drawRobot(point_x, point_y, angle) {
+      const radius = 5;
+      this.mainContext.clearRect(
         this.point_last_x - (radius + 5) / 2,
         this.point_last_y - (radius + 5) / 2,
         radius + 5,
         radius + 5
       );
-      const origin_x = map.info.origin.position.x;
-      const origin_y = map.info.origin.position.y;
-      const resolution = map.info.resolution;
-      console.log("Coordenadas origin");
-      console.log(origin_x);
-      console.log(origin_y);
+      const origin_x = this.map.info.origin.position.x;
+      const origin_y = this.map.info.origin.position.y;
+      const resolution = this.map.info.resolution;
 
-      // Dibujar el punto en el canvas
       const point_x_index =
         this.map.info.width * this.scale -
         ((point_x - origin_x) * this.scale) / resolution;
       const point_y_index = -((origin_y - point_y) * this.scale) / resolution;
+      // Define the size of the image
+      const imageSize = 100; // Change this value to scale the image
+      // Draw the robot image with rotation
 
-      context.beginPath();
-      context.arc(point_x_index, point_y_index, radius, 0, 2 * Math.PI);
 
-      context.fillStyle = "red"; // Color del punto
-      context.fill();
-      context.closePath();
+      // Calculate the clear area size based on the image size
+      const clearSize = imageSize + 10;
+
+      // Clear the previous robot image area
+      this.mainContext.clearRect(
+        this.point_last_x - clearSize / 2,
+        this.point_last_y - clearSize / 2,
+        clearSize,
+        clearSize
+      );
+      // Redraw the static map and grid
+      this.mainContext.drawImage(this.mapCanvas, 0, 0);
+      if (this.robotImage.complete) {
+        this.mainContext.save();
+        this.mainContext.translate(point_x_index, point_y_index);
+        this.mainContext.rotate(-angle- Math.PI/2);
+        this.mainContext.drawImage(this.robotImage, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
+        this.mainContext.restore();
+      } else {
+        this.robotImage.onload = () => {
+          this.mainContext.save();
+          this.mainContext.translate(point_x_index, point_y_index);
+          this.mainContext.rotate(-angle- Math.PI/2);
+          this.mainContext.drawImage(this.robotImage, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
+          this.mainContext.restore();
+        };
+      }
+
       this.point_last_x = point_x_index;
       this.point_last_y = point_y_index;
     },
   },
+
 };
 </script>
 
