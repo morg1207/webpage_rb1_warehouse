@@ -10,6 +10,7 @@
 <script>
 import ROSLIB from "roslib";
 import robotImageSrc from "@/assets/robot.png"; // Import the image
+import shelfImageSrc from "@/assets/shelf.png"; // Import the image
 
 export default {
   name: "MapComponent",
@@ -34,10 +35,14 @@ export default {
       mainContext: null,
 
       scale: 5,
-      point_last_x: 0,
-      point_last_y: 0,
+      point_last_x_robot: 0,
+      point_last_y_robot: 0,
+      point_last_x_shelf: 0,
+      point_last_y_shelf: 0,
+      point_last_angle_shelf: 0,
       robotImage: new Image(), // Initialize the robot image
-
+      shelfImage: new Image(), // Initialize the robot image
+      shelf_detected: false
     };
   },
 
@@ -56,6 +61,7 @@ export default {
         console.log("Map subscriber");
       });
       this.robotImage.src = robotImageSrc;
+      this.shelfImage.src = shelfImageSrc;
     },
     // amcl_pose subscribe
     amclPose(ros) {
@@ -75,6 +81,27 @@ export default {
         console.log(message);
       });
     },
+
+    // Shelf Subscription
+    shelfPose(ros) {
+      console.log("subscritpion pose shelf");
+      this.connected = true;
+      let topic = new ROSLIB.Topic({
+        ros: ros,
+        name: "/shelf_pose",
+        messageType: "geometry_msgs/msg/Pose",
+      });
+      topic.subscribe((message) => {
+        console.log("Shelf pose ");
+        const position = message.position;
+        const orientation = message.orientation;
+        const angle = this.quaternionToAngle(orientation);
+        this.drawShelf(position.x, position.y, angle);
+        console.log(message);
+        this.shelf_detected = true;
+      });
+    },
+
     quaternionToAngle(q) {
       const siny_cosp = 2 * (q.w * q.z + q.x * q.y);
       const cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
@@ -196,8 +223,8 @@ export default {
     drawRobot(point_x, point_y, angle) {
       const radius = 5;
       this.mainContext.clearRect(
-        this.point_last_x - (radius + 5) / 2,
-        this.point_last_y - (radius + 5) / 2,
+        this.point_last_x_robot - (radius + 5) / 2,
+        this.point_last_y_robot - (radius + 5) / 2,
         radius + 5,
         radius + 5
       );
@@ -219,8 +246,8 @@ export default {
 
       // Clear the previous robot image area
       this.mainContext.clearRect(
-        this.point_last_x - clearSize / 2,
-        this.point_last_y - clearSize / 2,
+        this.point_last_x_robot - clearSize / 2,
+        this.point_last_y_robot - clearSize / 2,
         clearSize,
         clearSize
       );
@@ -232,6 +259,7 @@ export default {
         this.mainContext.rotate(-angle- Math.PI/2);
         this.mainContext.drawImage(this.robotImage, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
         this.mainContext.restore();
+        console.log("Dibujando robot");
       } else {
         this.robotImage.onload = () => {
           this.mainContext.save();
@@ -241,9 +269,66 @@ export default {
           this.mainContext.restore();
         };
       }
+      if(this.shelf_detected){
+          console.log("Dibujando shelf");
+          this.drawShelf(this.point_last_x_shelf, this.point_last_y_shelf, this.point_last_angle_shelf);
+      };
 
-      this.point_last_x = point_x_index;
-      this.point_last_y = point_y_index;
+      this.point_last_x_robot = point_x_index;
+      this.point_last_y_robot = point_y_index;
+    },
+
+    drawShelf(point_x, point_y, angle) {
+      const radius = 5;
+      this.mainContext.clearRect(
+        this.point_last_x_shelf - (radius + 5) / 2,
+        this.point_last_y_shelf - (radius + 5) / 2,
+        radius + 5,
+        radius + 5
+      );
+      const origin_x = this.map.info.origin.position.x;
+      const origin_y = this.map.info.origin.position.y;
+      const resolution = this.map.info.resolution;
+
+      const point_x_index =
+        this.map.info.width * this.scale -
+        ((point_x - origin_x) * this.scale) / resolution;
+      const point_y_index = -((origin_y - point_y) * this.scale) / resolution;
+      // Define the size of the image
+      const imageSize = 100; // Change this value to scale the image
+      // Draw the robot image with rotation
+
+
+      // Calculate the clear area size based on the image size
+      const clearSize = imageSize + 10;
+
+      // Clear the previous robot image area
+      this.mainContext.clearRect(
+        this.point_last_x_shelf - clearSize / 2,
+        this.point_last_y_shelf - clearSize / 2,
+        clearSize,
+        clearSize
+      );
+      // Redraw the static map and grid
+      if (this.shelfImage.complete) {
+        this.mainContext.save();
+        this.mainContext.translate(point_x_index, point_y_index);
+        this.mainContext.rotate(-angle + Math.PI/2);
+        this.mainContext.drawImage(this.shelfImage, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
+        this.mainContext.restore();
+      } else {
+        this.shelfImage.onload = () => {
+          this.mainContext.save();
+          this.mainContext.translate(point_x_index, point_y_index);
+          this.mainContext.rotate(-angle+ Math.PI/2);
+          this.mainContext.drawImage(this.sehlfImage, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
+          this.mainContext.restore();
+        };
+      }
+
+      this.point_last_x_shelf = point_x;
+      this.point_last_y_shelf = point_y;
+      this.point_last_angle_shelf = angle;
     },
   },
 

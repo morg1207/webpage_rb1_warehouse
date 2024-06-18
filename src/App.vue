@@ -13,23 +13,23 @@
 </script>
 
 <template>
-  <div id="app" class="container-fluid">
+  <div id="app" class="container-fluid app-background">
     <div class="row">
       <div class="col-2 text-center">
         <!-- Connect-->
-        <div class="card mt-2">
+        <div class="card mt-2  custom-card">
           <RobotConfigComponent @my-event="connect_ros"></RobotConfigComponent>
         </div>
 
         <!--Log-->
-        <div class="card mt-2">
+        <div class="card mt-2  custom-card">
           <LogsComponent
             ref="LogsComponentRef"
             v:bind:usuario="usuario"
           ></LogsComponent>
         </div>
         <!-- Load file-->
-        <div class="card mt-2">
+        <div class="card mt-2  custom-card">
           <ParamsComponent
             @event_config_web="config_web_event"
             ref="ParamsComponentRef"
@@ -39,7 +39,7 @@
       </div>
       <!--Map-->
       <div class="col-6" style="overflow: auto">
-        <div class="map-column">
+        <div class="map-column  custom-card">
           <MapComponent
             ref="MapComponentRef"
             v:bind:usuario="usuario"
@@ -47,8 +47,8 @@
         </div>
       </div>
       <!--Botones-->
-      <div class="col-1 button-container">
-        <div class="button-column">
+      <div class="col-2.0 button-container">
+        <div class="button-column  custom-card mb-3">
           <ButtonComponent
             ref="ButtonInitLocComponentRef"
             v:bind:usuario="usuario"
@@ -60,7 +60,7 @@
             >
         </ButtonComponent>
         </div>
-        <div class="button-column">
+        <div class="button-column  custom-card mb-3">
           <ButtonComponent
             ref="ButtonFindShelfComponentRef"
             v:bind:usuario="usuario"
@@ -71,19 +71,19 @@
             :buttonPublishBT="'find_shelf_and_publish'"
           ></ButtonComponent>
         </div>
-        <div class="button-column">
+        <div class="button-column  custom-card mb-3">
           <ButtonComponent></ButtonComponent>
         </div>
-        <div class="button-column">
+        <div class="button-column  custom-card mb-3">
           <ButtonComponent></ButtonComponent>
         </div>
-        <div class="button-column">
+        <div class="button-column  custom-card mb-3 ">
           <ButtonComponent></ButtonComponent>
         </div>
       </div>
       <!--JOystick-->
-      <div class="col-3">
-        <div class="joystick-column">
+      <div class="col-2.0">
+        <div class="joystick-column w-100  custom-card">
           <JoystickComponent
             ref="JoystickComponentRef"
             v:bind:usuario="usuario"
@@ -111,6 +111,7 @@ export default {
       console.log("Evento de conexion recibido");
       this.$refs.MapComponentRef.setMapViewer(ros);
       this.$refs.MapComponentRef.amclPose(ros);
+      this.$refs.MapComponentRef.shelfPose(ros);
       this.$refs.JoystickComponentRef.joystickConfig(ros);
       this.$refs.LogsComponentRef.logsInit();
       this.$refs.ParamsComponentRef.paramInit(ros);
@@ -127,55 +128,3 @@ export default {
 };
 </script>
 
-<style scoped>
-.container {
-  display: flex;
-  flex-direction: row;
-  height: 100vh; /* Use the full height of the viewport */
-}
-
-.config-column {
-  flex: 0 0 20%; /* 20% of the width */
-  padding: 1px; /* Optional: add some padding */
-  box-sizing: border-box;
-}
-
-.map-column {
-  flex: 0 0 40%; /* 40% of the width */
-  padding: 10px; /* Optional: add some padding */
-  box-sizing: border-box;
-}
-.button-column {
-  flex: 0 0 20%; /* 40% of the width */
-  padding: 10px; /* Optional: add some padding */
-  box-sizing: border-box;
-}
-.joystick-column {
-  flex: 0 0 20%; /* 40% of the width */
-  padding: 10px; /* Optional: add some padding */
-  box-sizing: border-box;
-}
-.app-container {
-  margin-top: 20px; /* Adjust the top margin as needed */
-  margin-bottom: 20px; /* Adjust the bottom margin as needed */
-}
-
-.button-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  height: calc(
-    100vh - 40px
-  ); /* Adjust this height to account for the margins */
-}
-
-.button-column {
-  display: flex;
-
-  justify-content: center; /* Center the buttons horizontally if needed */
-}
-
-.button-column > * {
-  flex: 0 0 15%; /* Make each button take up a portion of the container height */
-}
-</style>

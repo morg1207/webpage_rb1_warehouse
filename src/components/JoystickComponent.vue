@@ -1,28 +1,34 @@
 <template>
-  <div class="col-6">
+  <div class="card mb-2 w-100">
     <div class="card-header">
-      <h4>Joystick</h4>
+      <h4>Joystick Control</h4>
     </div>
     <div class="card-body">
-      <div id="dragstartzone" @mousedown="startDrag" @mousemove="doDrag"></div>
-      <div id="dragCircle" :style="dragCircleStyle"></div>
-    </div>
-  </div>
-  <div class="col-6">
-    <div class="card-header">
-      <h4>Joystick values</h4>
-    </div>
-    <div class="card-body">
-      <hr />
-      <p>Vertical: {{ joystick.vertical.toFixed(3) }}</p>
-      <br />
-      <p>Horizontal: {{ joystick.horizontal.toFixed(3) }}</p>
+      <button class="btn btn-primary"
+              :class="{ 'btn-disabled': !joystickConfigured, 'btn-active': joystickControlEnabled }"
+              @click="toggleJoystickControl"
+              :disabled="!joystickConfigured">
+        {{ joystickControlEnabled ? 'Disable Joystick Control' : 'Enable Joystick Control' }}
+      </button>
+
+      <div class="joystick-content mt-3" v-if="joystickControlEnabled">
+        <div id="dragstartzone" @mousedown="startDrag" @mousemove="doDrag"></div>
+        <div id="dragCircle" :style="dragCircleStyle"></div>
+      </div>
+
+      <div class="joystick-values mt-3">
+        <h5>Joystick Values</h5>
+        <hr />
+        <p v-if="joystickControlEnabled">Vertical: {{ joystick.vertical.toFixed(3) }}</p>
+        <p v-if="joystickControlEnabled">Horizontal: {{ joystick.horizontal.toFixed(3) }}</p>
+        <p v-else>Joystick control is disabled.</p>
+      </div>
     </div>
   </div>
 </template>
-
 <script>
 import ROSLIB from "roslib";
+
 
 export default {
   name: "JoystickComponent",
@@ -49,14 +55,41 @@ export default {
         height: "75px",
       },
       topic_cmd_vel: "cmd_vel",
+      joystickControlEnabled: false,
+      joystickConfigured: false,
+      shelf_detected: false
     };
   },
 
   methods: {
+
+    toggleJoystickControl()  {
+      if (!this.joystickConfigured) return;
+
+      this.joystickControlEnabled = !this.joystickControlEnabled;
+      if (this.joystickControlEnabled) {
+        this.activateJoystickControl();
+      } else {
+        this.deactivateJoystickControl();
+      }
+    },
+
+    activateJoystickControl(){
+      this.joystickControlEnabled=true;
+      this.pubInterval = setInterval(this.publishCmdVel, 100);
+      console.log("Publicando mensajes");
+    },
+    deactivateJoystickControl(){
+      this.joystickControlEnabled=false;
+      clearInterval(this.pubInterval)
+      console.log("Joystick desactivado");
+    },
+    
     joystickConfig(ros) {
+      this.joystickConfigured = true
       console.log("Joystick configurado");
       this.ros = ros;
-      this.pubInterval = setInterval(this.publishCmdVel, 100);
+      //this.pubInterval = setInterval(this.publishCmdVel, 100);
     },
     paramConfig(config_web) {
       console.log(config_web);
@@ -137,5 +170,24 @@ export default {
 </script>
 
 <style scoped>
-/* Add any styles specific to the map component here */
+.joystick-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.joystick-values {
+  margin-top: 20px;
+}
+
+.btn-disabled {
+  opacity: 0.5; /* Botón opaco cuando está deshabilitado */
+  cursor: not-allowed; /* Cursor no permitido cuando está deshabilitado */
+}
+
+.btn-active {
+  background-color: #007bff; /* Color de fondo cuando está activo */
+  border-color: #007bff; /* Color del borde cuando está activo */
+  color: #fff; /* Color del texto cuando está activo */
+}
 </style>
