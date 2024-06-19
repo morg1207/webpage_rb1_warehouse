@@ -32,7 +32,7 @@ export default {
       ros: null,
       logs: [],
       loading: false,
-      rosbridge_address: "ws://localhost:9090",
+      rosbridge_address: "wss://i-0f6f99b9ec098a68c.robotigniteacademy.com/b65609ba-59e1-45a4-9c07-2bfbc3257f58/rosbridge/",
       port: "9090",
       state: false,
       mapViewer: null,
@@ -44,7 +44,7 @@ export default {
     connect() {
       this.loading = true;
       this.ros = new ROSLIB.Ros({
-        url: "ws://localhost:9090",
+        url: this.rosbridge_address
       });
       this.ros.on("connection", () => {
         console.log("Conectado a ROS");
