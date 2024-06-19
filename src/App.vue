@@ -56,7 +56,7 @@
             :buttonTextActive="'Init Localization'"
             :buttonTextInactive="'Deactivated'"
             :buttonTextProcessing="'Localizando robot...'"
-            :buttonPublishBT="'init_localization'"
+            :buttonPublishBT="'find_station_and_init_local'"
             >
         </ButtonComponent>
         </div>
@@ -72,13 +72,37 @@
           ></ButtonComponent>
         </div>
         <div class="button-column  custom-card mb-3">
-          <ButtonComponent></ButtonComponent>
+          <ButtonComponent
+            ref="ButtonApproachAndPickShelfComponentRef"
+            v:bind:usuario="usuario"
+            :initialState="'inactive'"
+            :buttonTextActive="'Approach and pick shelf'"
+            :buttonTextInactive="'Deactivated'"
+            :buttonTextProcessing="'Approach shelf...'"
+            :buttonPublishBT="'approach_and_pick_shelf'"
+          ></ButtonComponent>
         </div>
         <div class="button-column  custom-card mb-3">
-          <ButtonComponent></ButtonComponent>
+          <ButtonComponent
+            ref="ButtonCarryAndDischargeShelfComponentRef"
+            v:bind:usuario="usuario"
+            :initialState="'inactive'"
+            :buttonTextActive="'Carry and discharge shelf'"
+            :buttonTextInactive="'Deactivated'"
+            :buttonTextProcessing="'Delivery shelf...'"
+            :buttonPublishBT="'carry_and_discharge_shelf'"
+          ></ButtonComponent>
         </div>
         <div class="button-column  custom-card mb-3 ">
-          <ButtonComponent></ButtonComponent>
+          <ButtonComponent
+            ref="ButtonExecuteAllTasksComponentRef"
+            v:bind:usuario="usuario"
+            :initialState="'inactive'"
+            :buttonTextActive="'Executed all tasks'"
+            :buttonTextInactive="'Deactivated'"
+            :buttonTextProcessing="'Completing all tasks...'"
+            :buttonPublishBT="'behaviortree_entire'"
+          ></ButtonComponent>
         </div>
       </div>
       <!--JOystick-->
@@ -117,6 +141,10 @@ export default {
       this.$refs.ParamsComponentRef.paramInit(ros);
       this.$refs.ButtonInitLocComponentRef.buttonInit(ros);
       this.$refs.ButtonFindShelfComponentRef.buttonInit(ros);
+      this.$refs.ButtonApproachAndPickShelfComponentRef.buttonInit(ros);
+      this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonInit(ros);
+      this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonShowSubButtons(ros)
+      this.$refs.ButtonExecuteAllTasksComponentRef.buttonInit(ros);
     },
     config_web_event(config_web) {
       console.log("[Params component] event function");

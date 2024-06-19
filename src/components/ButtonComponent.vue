@@ -9,6 +9,13 @@
       <span v-else>{{ buttonText }}</span>
     </button>
     <p v-if="state === 'processing'" class="processing-text"> {{buttonTextProcessing}}</p>
+    <!-- Agregar los botones cuadrados debajo del botón principal -->
+
+    <div v-if="showSubButtons">
+      <button class="sub-button" @click="handleSubButtonClick(1)">1</button>
+      <button class="sub-button" @click="handleSubButtonClick(2)">2</button>
+      <button class="sub-button" @click="handleSubButtonClick(3)">3</button>
+    </div>
   </div>
 </template>
 
@@ -44,6 +51,7 @@ export default {
     return {
       state: this.initialState,
       ros: null,
+      showSubButtons: false, // Agregar estado para mostrar los botones cuadrados
     };
   },
   computed: {
@@ -88,7 +96,16 @@ export default {
         }
       });
     },
+    buttonShowSubButtons(ros){
 
+      this.publishPoseNavTopic = new ROSLIB.Topic({
+        ros: ros,
+        name: "/pose_discharge_nav",
+        messageType: "geometry_msgs/msg/Pose",
+      });
+
+      this.showSubButtons = true;
+    },
 
     handleClick() {
       if (this.state === "active") {
@@ -101,6 +118,34 @@ export default {
     },
     deactivateButton() {
       this.state = "inactive";
+    },
+    handleSubButtonClick(number) {
+      // Aquí puedes manejar la lógica para cada botón cuadrado
+      let message = new ROSLIB.Message({
+            position: { x: 0.0, y: 0.0, z: 0 },
+            orientation: { x: 0., y: 0., z: 0.0, w: 1.0 },
+        });
+      if(number == 1){
+        message = new ROSLIB.Message({
+            position: { x: 2.033, y: -1.323, z: 0 },
+            orientation: { x: 0., y: 0., z: -0.734, w: 0.680 },
+        });
+      };
+      if(number == 2){
+        message = new ROSLIB.Message({
+            position: { x: this.joystick.vertical, y: 0, z: 0 },
+            orientation: { x: 0, y: 0, z: -1 * this.joystick.horizontal },
+        });
+      };
+      if(number == 3){
+        message = new ROSLIB.Message({
+            position: { x: this.joystick.vertical, y: 0, z: 0 },
+            orientation: { x: 0, y: 0, z: -1 * this.joystick.horizontal },
+        });
+      };
+      this.publishPoseNavTopic.publish(message);
+      console.log(`Botón cuadrado ${number} presionado`);
+
     },
   },
 };
@@ -158,5 +203,22 @@ export default {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+/* Estilos para los botones cuadrados */
+.sub-button {
+  display: inline-block;
+  margin: 5px;
+  padding: 10px;
+  border: 2px solid #333;
+  border-radius: 5px;
+  background-color: #eee;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+.sub-button:hover {
+  background-color: #ccc;
+  color: #fff;
 }
 </style>
