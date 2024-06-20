@@ -14,22 +14,22 @@
 
 <template>
   <div id="app" class="container-fluid app-background">
-    <div class="row">
-      <div class="col-2 text-center">
+    <div class="row"> <!-- Añadido margen superior -->
+      <div class="col-2 text-center custom-colum">
         <!-- Connect-->
-        <div class="card mt-2  custom-card">
+        <div class="card mt-2  custom-card mb-3">
           <RobotConfigComponent @my-event="connect_ros"></RobotConfigComponent>
         </div>
 
         <!--Log-->
-        <div class="card mt-2  custom-card">
+        <div class="card mt-2  custom-card mb-3">
           <LogsComponent
             ref="LogsComponentRef"
             v:bind:usuario="usuario"
           ></LogsComponent>
         </div>
         <!-- Load file-->
-        <div class="card mt-2  custom-card">
+        <div class="card mt-2  custom-card mb-3">
           <ParamsComponent
             @event_config_web="config_web_event"
             ref="ParamsComponentRef"
@@ -47,7 +47,10 @@
         </div>
       </div>
       <!--Botones-->
-      <div class="col-2.0 button-container">
+      <div class="col-2 button-container">
+        <div class="button-column  custom-card mb-3">
+          <CallServiceComponent></CallServiceComponent>
+        </div>
         <div class="button-column  custom-card mb-3">
           <ButtonComponent
             ref="ButtonInitLocComponentRef"
@@ -105,13 +108,10 @@
           ></ButtonComponent>
         </div>
       </div>
-      <!--JOystick-->
-      <div class="col-2.0">
-        <div class="joystick-column w-100  custom-card">
-          <JoystickComponent
-            ref="JoystickComponentRef"
-            v:bind:usuario="usuario"
-          ></JoystickComponent>
+      <!-- Joystick -->
+      <div class="col-2 joystick-column">
+        <div class="custom-card w-100 d-flex justify-content-center align-items-center">
+          <JoystickComponent ref="JoystickComponentRef" v-bind:usuario="usuario"></JoystickComponent>
         </div>
       </div>
     </div>

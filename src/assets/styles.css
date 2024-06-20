@@ -49,6 +49,11 @@
   -webkit-user-select: none;
 }
 
+
+.card {
+  margin-top: 15px; /* Márgenes uniformes */
+}
+
 html, body, #app {
   height: 100%;
   margin: 0;
@@ -57,11 +62,12 @@ html, body, #app {
   overflow-x: hidden; /* Evita el desbordamiento horizontal */
 }
 
+/* Ajustes específicos para las columnas y tarjetas */
 .app-background {
   position: relative;
   z-index: 1;
   height: 100%;
-  width: 100%; /* Asegura que el fondo ocupe todo el ancho */
+  width: 100%;
 }
 
 .app-background::before {
@@ -93,6 +99,7 @@ html, body, #app {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
   padding: 15px; /* Espaciado interno */
   margin-bottom: 15px; /* Espaciado entre tarjetas */
+  margin-top: 20px; /* Espaciado superior uniforme */
 }
 
 .custom-card h4 {
@@ -119,11 +126,19 @@ html, body, #app {
 
 .joystick-column {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 20px; /* Espacio adicional entre joystick y botones */
+  justify-content: center; /* Centra el contenido horizontalmente */
+  align-items: center; /* Centra el contenido verticalmente */
+  height: 100%; /* Asegura que la columna ocupe todo el espacio disponible */
+  margin-top: 00px; /* Espacio superior uniforme */
+}
+.custom-column {
+  margin-top: 20px; /* Margen superior uniforme para todas las columnas */
 }
 
-.card {
-  margin-top: 15px; /* Márgenes uniformes */
+.custom-card.w-100.d-flex.justify-content-center.align-items-center {
+  height: 100%; /* Asegura que la tarjeta ocupe todo el espacio disponible */
+}
+
+.mt-4 {
+  margin-top: 1.5rem !important; /* Clase de Bootstrap para margen superior uniforme */
 }

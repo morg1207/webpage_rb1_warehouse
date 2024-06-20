@@ -2,7 +2,7 @@
   <div class="card-header">
     <h4>Logs</h4>
   </div>
-  <div class="card-body">
+  <div class="card-body logs-container">
     <p v-for="(log, index) in logs" :key="index">{{ log }}</p>
   </div>
 </template>
@@ -23,3 +23,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.logs-container {
+  max-height: 90px; /* Ajusta esta altura según tus necesidades */
+  overflow-y: auto; /* Habilita el desplazamiento vertical */
+}
+</style>

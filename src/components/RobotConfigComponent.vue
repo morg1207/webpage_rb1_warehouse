@@ -1,25 +1,37 @@
 <template>
-  <div class="card-body">
-    <h3>Connection status</h3>
-    <p class="text-danger" v-if="!connected">Not connected!</p>
-    <p class="text-success" v-if="connected">Connected!</p>
-    <label>ROSBridge address</label>
-    <br />
-    <input type="text" v-model="rosbridge_address" />
-    <br /><br />
-    <button
-      :disabled="loading"
-      class="btn btn-danger"
-      @click="disconnect"
-      v-if="connected"
-    >
-      Disconnect!
-    </button>
-    <button :disabled="loading" class="btn btn-success" @click="connect" v-else>
-      Connect!
-    </button>
+  <div class="card mb-3 w-100 p-3 shadow-sm">
+    <div class="card-body">
+      <h4 class="card-title">Connection Status</h4>
+      <p class="text-danger" v-if="!connected">Not connected!</p>
+      <p class="text-success" v-if="connected">Connected!</p>
+      <div class="form-group">
+        <label for="rosbridge-address" class="form-label">ROSBridge Address</label>
+        <input
+          id="rosbridge-address"
+          type="text"
+          v-model="rosbridge_address"
+          class="form-control"
+          placeholder="ws://localhost:9090"
+        />
+      </div>
+      <div class="mt-3">
+        <button
+          :disabled="loading"
+          class="btn btn-danger me-2"
+          @click="disconnect"
+          v-if="connected"
+        >
+          Disconnect
+        </button>
+        <button :disabled="loading" class="btn btn-success" @click="connect" v-else>
+          Connect
+        </button>
+      </div>
+    </div>
   </div>
 </template>
+
+
 
 <script>
 import ROSLIB from "roslib";
@@ -75,5 +87,47 @@ export default {
 </script>
 
 <style scoped>
-/* Add any styles specific to the config page here */
+.card {
+  max-width: 500px;
+  margin: auto;
+  border-radius: 15px;
+  border: 1px solid #dee2e6;
+  background-color: #ffffff;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  font-weight: bold;
+  color: #555;
+}
+
+.form-control {
+  border-radius: 10px;
+  border: 1px solid #ced4da;
+  padding: 0.5rem 0.75rem;
+}
+
+.btn {
+  min-width: 100px;
+  border-radius: 10px;
+}
+
+.text-danger,
+.text-success {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.me-2 {
+  margin-right: 0.5rem;
+}
 </style>
