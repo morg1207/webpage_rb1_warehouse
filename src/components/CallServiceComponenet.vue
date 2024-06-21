@@ -8,6 +8,10 @@
       <pre>{{ response.error }}</pre>
       <p v-if="response.message">{{ response.message }}</p>
     </div>
+    <div class="output-container">
+      <h3>Proceso Output:</h3>
+      <pre>{{ processOutput.join('\n') }}</pre>
+    </div>
   </div>
 </template>
 
@@ -19,12 +23,15 @@ export default {
   data() {
     return {
       response: null,
-      buttonLabel: "Init launch file",
+      buttonLabel: "Iniciar archivo de lanzamiento",
       isLaunched: false,
+      processOutput: [],
+      intervalId: null,
     };
   },
   methods: {
     async handleButtonClick() {
+      console.log("Button clicked");
       if (this.isLaunched) {
         await this.stopProcesses();
       } else {
@@ -33,30 +40,56 @@ export default {
     },
     async callLaunchFile() {
       try {
-        const res = await axios.post('wss://i-07fcfbc3e1d17e5b3.robotigniteacademy.com/05c14792-49c2-4821-99e1-44a490baf3e9/rosbridge/:5000/launch');
+        console.log("Sending request to launch file");
+        const res = await axios.post('https://i-01e38316aa8103772.robotigniteacademy.com/0a429db1-291d-4d1f-95d3-3b3aec993c47/webpage/launch');
         this.response = res.data;
+        console.log("Launch response:", this.response);
         if (!this.response.error) {
           this.isLaunched = true;
-          this.buttonLabel = "Reiniciar servidores";
+          this.buttonLabel = "Detener procesos";
+          this.startFetchingOutput();
         }
       } catch (error) {
-        console.error('Error launching file:', error);
+        console.error('Error iniciando archivo de lanzamiento:', error);
         this.response = { error: error.message };
       }
     },
     async stopProcesses() {
       try {
-        const res = await axios.post('wss://i-07fcfbc3e1d17e5b3.robotigniteacademy.com/05c14792-49c2-4821-99e1-44a490baf3e9/rosbridge/:5000/stop');
+        console.log("Sending request to stop processes");
+        const res = await axios.post('https://i-01e38316aa8103772.robotigniteacademy.com/0a429db1-291d-4d1f-95d3-3b3aec993c47/webpage/stop');
         this.response = res.data;
+        console.log("Stop response:", this.response);
         if (!this.response.error) {
           this.isLaunched = false;
-          this.buttonLabel = "Init launch file";
+          this.buttonLabel = "Iniciar archivo de lanzamiento";
+          this.stopFetchingOutput();
         }
       } catch (error) {
-        console.error('Error stopping processes:', error);
+        console.error('Error deteniendo procesos:', error);
         this.response = { error: error.message };
       }
     },
+    startFetchingOutput() {
+      this.intervalId = setInterval(this.fetchOutput, 1000);
+    },
+    stopFetchingOutput() {
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+        this.intervalId = null;
+      }
+    },
+    async fetchOutput() {
+      try {
+        const res = await axios.get('https://i-01e38316aa8103772.robotigniteacademy.com/0a429db1-291d-4d1f-95d3-3b3aec993c47/webpage/output');
+        this.processOutput = res.data;
+      } catch (error) {
+        console.error('Error fetching process output:', error);
+      }
+    },
+  },
+  beforeDestroy() {
+    this.stopFetchingOutput();
   },
 };
 </script>
@@ -67,5 +100,14 @@ pre {
   background-color: #f8f8f8;
   padding: 10px;
   border-radius: 5px;
+}
+
+.output-container {
+  height: 300px; /* Puedes ajustar la altura según tus necesidades */
+  overflow-y: scroll;
+  background-color: #f8f8f8;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
 }
 </style>

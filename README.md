@@ -1,7 +1,7 @@
 # Install dependecies
 ```sh
-sudo apt install curl
-sudo apt install unzip
+sudo apt install -y curl 
+sudo apt install -y unzip
 ```
 # Install fnm
 ```sh
