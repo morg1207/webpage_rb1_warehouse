@@ -50,6 +50,7 @@
         <div class="button-column  custom-card mb-3">
           <CallServiceComponent
           @my-event-call-service="call_service"
+          @my-event-stop-service="stop_service"
           ref="ButtonInitCallServiceRef"
           v:bind:usuario="usuario">
         </CallServiceComponent>
@@ -136,18 +137,32 @@ export default {
     ParamsComponent,
     CallServiceComponent,
   },
-
+  data() {
+    return {
+      ros: null,
+    };
+  },
   methods: {
     call_service(){
-      this.$refs.ButtonInitLocComponentRef.buttonInit(ros);
-      this.$refs.ButtonFindShelfComponentRef.buttonInit(ros);
-      this.$refs.ButtonApproachAndPickShelfComponentRef.buttonInit(ros);
-      this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonInit(ros);
-      this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonShowSubButtons(ros);
-      this.$refs.ButtonExecuteAllTasksComponentRef.buttonInit(ros);
+      this.$refs.ButtonInitLocComponentRef.buttonInit(this.ros);
+      this.$refs.ButtonFindShelfComponentRef.buttonInit(this.ros);
+      this.$refs.ButtonApproachAndPickShelfComponentRef.buttonInit(this.ros);
+      this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonInit(this.ros);
+      this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonShowSubButtons(this.ros);
+      this.$refs.ButtonExecuteAllTasksComponentRef.buttonInit(this.ros);
 
     },
+    stop_service(){
+      //close button
+      this.$refs.ButtonInitLocComponentRef.buttonClose();
+      this.$refs.ButtonFindShelfComponentRef.buttonClose();
+      this.$refs.ButtonApproachAndPickShelfComponentRef.buttonClose();
+      this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonClose();
+      this.$refs.ButtonExecuteAllTasksComponentRef.buttonClose();
+      this.$refs.MapComponentRef.mapClose();
+    },
     connect_ros(ros,webpage_adress) {
+      this.ros = ros;
       console.log("Evento de conexion recibido");
       this.$refs.MapComponentRef.setMapViewer(ros);
       this.$refs.MapComponentRef.amclPose(ros);
@@ -167,7 +182,6 @@ export default {
       this.$refs.ButtonFindShelfComponentRef.buttonClose();
       this.$refs.ButtonApproachAndPickShelfComponentRef.buttonClose();
       this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonClose();
-      this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonClose()
       this.$refs.ButtonExecuteAllTasksComponentRef.buttonClose();
       this.$refs.MapComponentRef.mapClose();
       this.$refs.JoystickComponentRef.joystickClose();

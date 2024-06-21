@@ -68,6 +68,8 @@ export default {
       this.state = "processing";
       if (this.isLaunched) {
         await this.stopProcesses();
+        this.$emit("my-event-stop-service");
+        console.log("Evento de stop service emitido");
       } else {
         await this.callLaunchFile();
         this.$emit("my-event-call-service");
@@ -77,8 +79,8 @@ export default {
     async callLaunchFile() {
       try {
         console.log("Sending request to launch file");
-        const res = await axios.post(this.webpage_adress + '/launch');
-        console.log(this.webpage_adress + '/launch');
+        const res = await axios.post(this.webpage_adress + 'launch');
+        console.log(this.webpage_adress + 'launch');
         this.response = res.data;
         console.log("Launch response:", this.response);
         if (!this.response.error) {
@@ -100,7 +102,7 @@ export default {
     async stopProcesses() {
       try {
         console.log("Sending request to stop processes");
-        const res = await axios.post(this.webpage_adress+ '/stop');
+        const res = await axios.post(this.webpage_adress+ 'stop');
         this.response = res.data;
         console.log("Stop response:", this.response);
         if (!this.response.error) {
@@ -127,7 +129,7 @@ export default {
     },
     async fetchOutput() {
       try {
-        const res = await axios.get(this.webpage_adress+'/output');
+        const res = await axios.get(this.webpage_adress+'output');
         this.processOutput = res.data;
       } catch (error) {
         console.error('Error fetching process output:', error);
