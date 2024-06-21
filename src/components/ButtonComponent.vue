@@ -96,6 +96,20 @@ export default {
         }
       });
     },
+    buttonClose() {
+      if (this.subscribeBtStatus) {
+        this.subscribeBtStatus.unsubscribe();
+        this.subscribeBtStatus = null;
+      }
+      if (this.publishTopic) {
+        this.publishTopic.unadvertise();
+        this.publishTopic = null;
+      }
+      this.showSubButtons = false;
+      console.log('Close button')
+      this.deactivateButton();
+    },
+
     buttonShowSubButtons(ros){
 
       this.publishPoseNavTopic = new ROSLIB.Topic({

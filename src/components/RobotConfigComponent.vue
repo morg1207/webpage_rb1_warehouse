@@ -14,6 +14,16 @@
           placeholder="ws://localhost:9090"
         />
       </div>
+      <div class="form-group">
+        <label for="webpage-address" class="form-label">WebPage Address</label>
+        <input
+          id="webpage-address"
+          type="text"
+          v-model="webpage_adress"
+          class="form-control"
+          placeholder=""
+        />
+      </div>
       <div class="mt-3">
         <button
           :disabled="loading"
@@ -45,6 +55,7 @@ export default {
       logs: [],
       loading: false,
       rosbridge_address: "wss://i-0f6f99b9ec098a68c.robotigniteacademy.com/b65609ba-59e1-45a4-9c07-2bfbc3257f58/rosbridge/",
+      webpage_adress:" ",
       port: "9090",
       state: false,
       mapViewer: null,
@@ -64,17 +75,20 @@ export default {
         this.connected = true;
         this.loading = false;
         //emito el eveto
-        this.$emit("my-event", this.ros);
+        this.$emit("my-event", this.ros,this.webpage_adress);
       });
       this.ros.on("error", (error) => {
         this.logs.unshift(`${new Date().toTimeString()} - Error: ${error}`);
         this.loading = false;
+        console.log("Error conection");
+        this.$emit("my-event-error-conection", this.ros);
       });
       this.ros.on("close", () => {
         this.logs.unshift(`${new Date().toTimeString()} - ¡Desconectado!`);
         this.connected = false;
         this.loading = false;
         console.log("Desconectado");
+        this.$emit("my-event-disconnect", this.ros);
       });
     },
     disconnect() {

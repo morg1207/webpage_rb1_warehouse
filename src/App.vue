@@ -18,7 +18,9 @@
       <div class="col-2 text-center custom-colum">
         <!-- Connect-->
         <div class="card mt-2  custom-card mb-3">
-          <RobotConfigComponent @my-event="connect_ros"></RobotConfigComponent>
+          <RobotConfigComponent @my-event="connect_ros" @my-event-error-conection="error_conection" @my-event-disconnect= "disconnect">
+
+          </RobotConfigComponent>
         </div>
 
         <!--Log-->
@@ -45,12 +47,17 @@
             v:bind:usuario="usuario"
           ></MapComponent>
         </div>
+        <div class="button-column  custom-card mb-3">
+          <CallServiceComponent
+          @my-event-call-service="call_service"
+          ref="ButtonInitCallServiceRef"
+          v:bind:usuario="usuario">
+        </CallServiceComponent>
+        </div>
+
       </div>
       <!--Botones-->
       <div class="col-2 button-container">
-        <div class="button-column  custom-card mb-3">
-          <CallServiceComponent></CallServiceComponent>
-        </div>
         <div class="button-column  custom-card mb-3">
           <ButtonComponent
             ref="ButtonInitLocComponentRef"
@@ -131,7 +138,16 @@ export default {
   },
 
   methods: {
-    connect_ros(ros) {
+    call_service(){
+      this.$refs.ButtonInitLocComponentRef.buttonInit(ros);
+      this.$refs.ButtonFindShelfComponentRef.buttonInit(ros);
+      this.$refs.ButtonApproachAndPickShelfComponentRef.buttonInit(ros);
+      this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonInit(ros);
+      this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonShowSubButtons(ros);
+      this.$refs.ButtonExecuteAllTasksComponentRef.buttonInit(ros);
+
+    },
+    connect_ros(ros,webpage_adress) {
       console.log("Evento de conexion recibido");
       this.$refs.MapComponentRef.setMapViewer(ros);
       this.$refs.MapComponentRef.amclPose(ros);
@@ -139,12 +155,24 @@ export default {
       this.$refs.JoystickComponentRef.joystickConfig(ros);
       this.$refs.LogsComponentRef.logsInit();
       this.$refs.ParamsComponentRef.paramInit(ros);
-      this.$refs.ButtonInitLocComponentRef.buttonInit(ros);
-      this.$refs.ButtonFindShelfComponentRef.buttonInit(ros);
-      this.$refs.ButtonApproachAndPickShelfComponentRef.buttonInit(ros);
-      this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonInit(ros);
-      this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonShowSubButtons(ros)
-      this.$refs.ButtonExecuteAllTasksComponentRef.buttonInit(ros);
+      this.$refs.ButtonInitCallServiceRef.callServiceInit(webpage_adress);
+    },
+    error_conection(){
+      this.$refs.LogsComponentRef.logsErrorConection();
+    },
+    disconnect(){
+      this.$refs.LogsComponentRef.logsDisconnect();
+      //close button
+      this.$refs.ButtonInitLocComponentRef.buttonClose();
+      this.$refs.ButtonFindShelfComponentRef.buttonClose();
+      this.$refs.ButtonApproachAndPickShelfComponentRef.buttonClose();
+      this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonClose();
+      this.$refs.ButtonCarryAndDischargeShelfComponentRef.buttonClose()
+      this.$refs.ButtonExecuteAllTasksComponentRef.buttonClose();
+      this.$refs.MapComponentRef.mapClose();
+      this.$refs.JoystickComponentRef.joystickClose();
+      this.$refs.ButtonInitCallServiceRef.callServiceClose();
+
     },
     config_web_event(config_web) {
       console.log("[Params component] event function");

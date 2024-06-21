@@ -20,6 +20,12 @@ export default {
     logsInit() {
       this.logs.unshift(new Date().toTimeString() + " - Connected!");
     },
+    logsErrorConection(){
+      this.logs.unshift(new Date().toTimeString() + " - Error, Verify rosbridge_adress");
+    },
+    logsDisconnect(){
+      this.logs.unshift(new Date().toTimeString() + " - Disconnect");
+    },
   },
 };
 </script>

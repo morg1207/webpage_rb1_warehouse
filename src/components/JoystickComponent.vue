@@ -91,6 +91,14 @@ export default {
       this.ros = ros;
       //this.pubInterval = setInterval(this.publishCmdVel, 100);
     },
+    joystickClose() {
+      this.joystickConfigured = false
+      console.log("Joystick close");
+      clearInterval(this.pubInterval)
+
+
+    },
+
     paramConfig(config_web) {
       console.log(config_web);
       this.topic_name = config_web.topic_cmd_vel.value;

@@ -63,6 +63,12 @@ export default {
       this.robotImage.src = robotImageSrc;
       this.shelfImage.src = shelfImageSrc;
     },
+    mapClose(){
+      console.log("Close Map");
+      this.mapContext.clearRect(0, 0, this.mapCanvas.width, this.mapCanvas.height);
+      this.mainContext.clearRect(0, 0, this.mainCanvas.width, this.mainCanvas.height);
+
+    },
     // amcl_pose subscribe
     amclPose(ros) {
       console.log("Config subscriber amcl_pose");
