@@ -72,7 +72,6 @@ export default {
         console.log("Evento de stop service emitido");
       } else {
         await this.callLaunchFile();
-        this.$emit("my-event-call-service");
         console.log("Evento de call service emitido");
       }
     },
@@ -87,6 +86,7 @@ export default {
           this.isLaunched = true;
           this.buttonLabel = "Reiniciar servidores";
           this.state = "active";
+          this.$emit("my-event-call-service");
           this.startFetchingOutput();
         } else {
           this.state = "inactive";
