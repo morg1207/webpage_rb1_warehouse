@@ -36,7 +36,8 @@ def launch_file():
             pass  # Clear the file
 
         process = subprocess.Popen(
-            ['ros2', 'launch', 'path_planner_server', 'navigation.launch.py'],
+            #['ros2', 'launch', 'path_planner_server', 'navigation.launch.py'],
+            ['ros2', 'launch', 'path_planner_server', 'entire_launch.launch.py'],
             stdout=open(output_file_path, 'a'),
             stderr=subprocess.STDOUT,
             text=True,
@@ -79,16 +80,27 @@ def stop_processes():
 
             # Imprimir los PIDs en la consola
             print(f"Stopping children PIDs: {children_pids}")
-
             # Terminar todos los procesos hijos
             for pid in children_pids:
-                child_process = psutil.Process(pid)
-                child_process.terminate()
-                child_process.wait()
+                try:
+                    child_process = psutil.Process(pid)
+                    child_process.terminate()
+                    child_process.wait(timeout=5)  # Esperar un poco antes de matar
+                except psutil.NoSuchProcess:
+                    print(f"Process {pid} already terminated")
+                except psutil.TimeoutExpired:
+                    print(f"Terminating process {pid} forcefully")
+                    child_process.kill()
+                    child_process.wait()
 
             # Terminar el proceso principal
-            process.terminate()
-            process.wait()
+            try:
+                process.terminate()
+                process.wait(timeout=5)
+            except psutil.TimeoutExpired:
+                print("Terminating main process forcefully")
+                process.kill()
+                process.wait()
 
             process_pid = None  # Reiniciar el PID almacenado
 

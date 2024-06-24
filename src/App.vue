@@ -68,6 +68,7 @@
             :buttonTextInactive="'Deactivated'"
             :buttonTextProcessing="'Localizando robot...'"
             :buttonPublishBT="'find_station_and_init_local'"
+            :buttonPublishFigure="'only_robot'"
             >
         </ButtonComponent>
         </div>
@@ -80,6 +81,7 @@
             :buttonTextInactive="'Deactivated'"
             :buttonTextProcessing="'Finding shelf...'"
             :buttonPublishBT="'find_shelf_and_publish'"
+            :buttonPublishFigure="'only_robot'"
           ></ButtonComponent>
         </div>
         <div class="button-column  custom-card mb-3">
@@ -91,6 +93,7 @@
             :buttonTextInactive="'Deactivated'"
             :buttonTextProcessing="'Approach shelf...'"
             :buttonPublishBT="'approach_and_pick_shelf'"
+            :buttonPublishFigure="'robot_with_shelf'"
           ></ButtonComponent>
         </div>
         <div class="button-column  custom-card mb-3">
@@ -102,6 +105,7 @@
             :buttonTextInactive="'Deactivated'"
             :buttonTextProcessing="'Delivery shelf...'"
             :buttonPublishBT="'carry_and_discharge_shelf'"
+            :buttonPublishFigure="'only_robot'"
           ></ButtonComponent>
         </div>
         <div class="button-column  custom-card mb-3 ">
@@ -113,6 +117,7 @@
             :buttonTextInactive="'Deactivated'"
             :buttonTextProcessing="'Completing all tasks...'"
             :buttonPublishBT="'behaviortree_entire'"
+            :buttonPublishFigure="'button_all_tasks'"
           ></ButtonComponent>
         </div>
       </div>
@@ -166,6 +171,7 @@ export default {
       console.log("Evento de conexion recibido");
       this.$refs.MapComponentRef.setMapViewer(ros);
       this.$refs.MapComponentRef.amclPose(ros);
+      this.$refs.MapComponentRef.RobotStateFIgure(ros);
       this.$refs.MapComponentRef.shelfPose(ros);
       this.$refs.JoystickComponentRef.joystickConfig(ros);
       this.$refs.LogsComponentRef.logsInit();
@@ -178,6 +184,8 @@ export default {
     disconnect(){
       this.$refs.LogsComponentRef.logsDisconnect();
       //close button
+
+      
       this.$refs.ButtonInitLocComponentRef.buttonClose();
       this.$refs.ButtonFindShelfComponentRef.buttonClose();
       this.$refs.ButtonApproachAndPickShelfComponentRef.buttonClose();

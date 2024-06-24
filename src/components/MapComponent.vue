@@ -11,6 +11,8 @@
 import ROSLIB from "roslib";
 import robotImageSrc from "@/assets/robot.png"; // Import the image
 import shelfImageSrc from "@/assets/shelf.png"; // Import the image
+import robotWithShelfImageSrc from "@/assets/robot_shelf.png"; // Import the image
+
 
 export default {
   name: "MapComponent",
@@ -28,7 +30,13 @@ export default {
 
       map: null,
 
-
+      points: [
+        { x: 0, y: 0, z: 0, w: 0, label: "A" },
+        { x: 1, y: 1, z: 0, w: 0, label: "B" },
+        { x: 2, y: 2, z: 0, w: 0, label: "C" },
+        { x: 2, y: 2, z: 0, w: 0, label: "D" },
+        // Añade más puntos según sea necesario
+      ], 
       mapCanvas: null,
       mapContext: null,
       mainCanvas: null,
@@ -42,7 +50,9 @@ export default {
       point_last_angle_shelf: 0,
       robotImage: new Image(), // Initialize the robot image
       shelfImage: new Image(), // Initialize the robot image
-      shelf_detected: false
+      robotWithShelfImage: new Image(), // Initialize the robot image
+      shelf_detected: false,
+      robot_state_figure: 'only_robot'
     };
   },
 
@@ -62,6 +72,7 @@ export default {
       });
       this.robotImage.src = robotImageSrc;
       this.shelfImage.src = shelfImageSrc;
+      this.robotWithShelfImage.src = robotWithShelfImageSrc;
     },
     mapClose(){
       console.log("Close Map");
@@ -87,7 +98,7 @@ export default {
         const position = message.pose.pose.position;
         const orientation = message.pose.pose.orientation;
         const angle = this.quaternionToAngle(orientation);
-        this.drawRobot(position.x, position.y, angle);
+        this.drawRobot(position.x, position.y, angle, this.robot_state_figure);
         console.log(message);
       });
     },
@@ -109,6 +120,21 @@ export default {
         this.drawShelf(position.x, position.y, angle);
         console.log(message);
         this.shelf_detected = true;
+      });
+    },
+
+    // Robot subscription
+    RobotStateFIgure(ros) {
+      console.log("subscritpion robot state figure");
+      this.connected = true;
+      let topic = new ROSLIB.Topic({
+        ros: ros,
+        name: "/robot_state_figure",
+        messageType: "std_msgs/msg/String",
+      });
+      topic.subscribe((message) => {
+        console.log(`Robot state figure recibido  ${message.data}`)
+        this.robot_state_figure = message.data
       });
     },
 
@@ -199,10 +225,40 @@ export default {
           }
         }
       }
-
       // Draw the image data onto the canvas
       context.putImageData(imageData, 0, 0);
+      // Draw yellow boxes based on points array
 
+      const origin_x = this.map.info.origin.position.x;
+      const origin_y = this.map.info.origin.position.y;
+      const resolution = this.map.info.resolution;
+
+
+      context.strokeStyle = 'yellow';
+      context.lineWidth = 7;
+      context.font = `${25}px Arial`; // Ajusta el tamaño de la fuente
+      context.fillStyle = 'black'; // Color del texto
+      this.points.forEach(point => {
+
+        const point_x_index =
+        this.map.info.width * this.scale -
+        ((point.x - origin_x) * this.scale) / resolution;
+        const point_y_index = -((origin_y - point.y) * this.scale) / resolution;
+
+        const boxSize = 14 * this.scale; // Define el tamaño del cuadro amarillo
+        const scaledX = point_x_index - boxSize/2 ;
+        const scaledY = point_y_index- boxSize/2;
+        
+
+        context.strokeRect(scaledX, scaledY, boxSize, boxSize);
+        //Texto
+        // Escribe el texto en el centro del cuadro
+        const textX = scaledX + boxSize / 2;
+        const textY = scaledY + boxSize / 2;
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillText(point.label, textX, textY);
+      });
       // Draw the grid
     },
 
@@ -230,7 +286,7 @@ export default {
         context.stroke();
       }
     },
-    drawRobot(point_x, point_y, angle) {
+    drawRobot(point_x, point_y, angle, robot_state_figure) {
       const radius = 5;
       this.mainContext.clearRect(
         this.point_last_x_robot - (radius + 5) / 2,
@@ -263,26 +319,47 @@ export default {
       );
       // Redraw the static map and grid
       this.mainContext.drawImage(this.mapCanvas, 0, 0);
-      if (this.robotImage.complete) {
-        this.mainContext.save();
-        this.mainContext.translate(point_x_index, point_y_index);
-        this.mainContext.rotate(-angle- Math.PI/2);
-        this.mainContext.drawImage(this.robotImage, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
-        this.mainContext.restore();
-        console.log("Dibujando robot");
-      } else {
-        this.robotImage.onload = () => {
+
+      if(robot_state_figure == 'only_robot'){
+        if (this.robotImage.complete) {
           this.mainContext.save();
           this.mainContext.translate(point_x_index, point_y_index);
           this.mainContext.rotate(-angle- Math.PI/2);
           this.mainContext.drawImage(this.robotImage, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
           this.mainContext.restore();
+          console.log("Dibujando robot");
+        } else {
+          this.robotImage.onload = () => {
+            this.mainContext.save();
+            this.mainContext.translate(point_x_index, point_y_index);
+            this.mainContext.rotate(-angle- Math.PI/2);
+            this.mainContext.drawImage(this.robotImage, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
+            this.mainContext.restore();
+          };
+        }
+        if(this.shelf_detected){
+            console.log("Dibujando shelf");
+            this.drawShelf(this.point_last_x_shelf, this.point_last_y_shelf, this.point_last_angle_shelf);
         };
       }
-      if(this.shelf_detected){
-          console.log("Dibujando shelf");
-          this.drawShelf(this.point_last_x_shelf, this.point_last_y_shelf, this.point_last_angle_shelf);
-      };
+      if(robot_state_figure == 'robot_with_shelf'){
+        if (this.robotWithShelfImage.complete) {
+          this.mainContext.save();
+          this.mainContext.translate(point_x_index, point_y_index);
+          this.mainContext.rotate(-angle- Math.PI/2);
+          this.mainContext.drawImage(this.robotWithShelfImage, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
+          this.mainContext.restore();
+          console.log("Dibujando robot with shelf");
+        } else {
+          this.robotWithShelfImage.onload = () => {
+            this.mainContext.save();
+            this.mainContext.translate(point_x_index, point_y_index);
+            this.mainContext.rotate(-angle- Math.PI/2);
+            this.mainContext.drawImage(this.robotWithShelfImage, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
+            this.mainContext.restore();
+          };
+        }
+      }
 
       this.point_last_x_robot = point_x_index;
       this.point_last_y_robot = point_y_index;

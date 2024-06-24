@@ -12,9 +12,10 @@
     <!-- Agregar los botones cuadrados debajo del botón principal -->
 
     <div v-if="showSubButtons">
-      <button class="sub-button" @click="handleSubButtonClick(1)">1</button>
-      <button class="sub-button" @click="handleSubButtonClick(2)">2</button>
-      <button class="sub-button" @click="handleSubButtonClick(3)">3</button>
+      <button class="sub-button" @click="handleSubButtonClick('A')">A</button>
+      <button class="sub-button" @click="handleSubButtonClick('B')">B</button>
+      <button class="sub-button" @click="handleSubButtonClick('C')">C</button>
+      <button class="sub-button" @click="handleSubButtonClick('D')">D</button>
     </div>
   </div>
 </template>
@@ -46,12 +47,23 @@ export default {
       type: String,
       default: "find_shelf_and_publish", // Text when button is in processing state
     },
+    buttonPublishFigure: {
+      type: String,
+      default: "only_robot", // Text when button is in processing state
+    },
   },
   data() {
     return {
       state: this.initialState,
       ros: null,
       showSubButtons: false, // Agregar estado para mostrar los botones cuadrados
+      points: [
+        { x: 0, y: 0, z: 0, w: 0, label: "A" },
+        { x: 1, y: 1, z: 0, w: 0, label: "B" },
+        { x: 2, y: 2, z: 0, w: 0, label: "C" },
+        { x: 2, y: 2, z: 0, w: 0, label: "D" },
+        // Añade más puntos según sea necesario
+      ], 
     };
   },
   computed: {
@@ -85,6 +97,11 @@ export default {
         name: "/bt_selector",
         messageType: "std_msgs/msg/String",
       });
+      this.publishTopicFigureState = new ROSLIB.Topic({
+        ros: ros,
+        name: "/robot_state_figure",
+        messageType: "std_msgs/msg/String",
+      });
       let subscribeBtStatus = new ROSLIB.Topic({
         ros: ros,
         name: "/bt_status",
@@ -93,6 +110,10 @@ export default {
       subscribeBtStatus.subscribe((message) => {
         if (message.data === this.buttonPublishBT + '/done') {
           this.state = "active";
+          this.publishTopicFigureState.publish(new ROSLIB.Message({ data: this.buttonPublishFigure }));
+          console.log(`------`)
+          console.log(`Publicado figure state  ${this.buttonPublishFigure}`)
+          console.log(`------`)
         }
       });
     },
@@ -133,32 +154,27 @@ export default {
     deactivateButton() {
       this.state = "inactive";
     },
-    handleSubButtonClick(number) {
+    handleSubButtonClick(label) {
       // Aquí puedes manejar la lógica para cada botón cuadrado
       let message = new ROSLIB.Message({
             position: { x: 0.0, y: 0.0, z: 0 },
             orientation: { x: 0., y: 0., z: 0.0, w: 1.0 },
         });
-      if(number == 1){
-        message = new ROSLIB.Message({
-            position: { x: 2.033, y: -1.323, z: 0 },
-            orientation: { x: 0., y: 0., z: -0.734, w: 0.680 },
-        });
-      };
-      if(number == 2){
-        message = new ROSLIB.Message({
-            position: { x: this.joystick.vertical, y: 0, z: 0 },
-            orientation: { x: 0, y: 0, z: -1 * this.joystick.horizontal },
-        });
-      };
-      if(number == 3){
-        message = new ROSLIB.Message({
-            position: { x: this.joystick.vertical, y: 0, z: 0 },
-            orientation: { x: 0, y: 0, z: -1 * this.joystick.horizontal },
-        });
-      };
+
+      for (let i = 0; i < this.points.length; i++) {
+        if (this.points[i].label === label) {
+          message = new ROSLIB.Message({
+            position: { x: this.points[i].x, y: this.points[i].y, z: 0. },
+            orientation: { x: 0., y: 0., z: this.points[i].z, w: this.points[i].w },
+          });
+        }
+      }
       this.publishPoseNavTopic.publish(message);
       console.log(`Botón cuadrado ${number} presionado`);
+      console.log(`Enviando punto de naveagcion x : ${this.points[i].x}`);
+      console.log(`Enviando punto de naveagcion y : ${this.points[i].y}`);
+      console.log(`Enviando punto de naveagcion z : ${this.points[i].z}`);
+      console.log(`Enviando punto de naveagcion w : ${this.points[i].w}`);
 
     },
   },
