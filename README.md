@@ -6,7 +6,7 @@ sudo apt install -y unzip
 # Install fnm
 ```sh
 curl -fsSL https://fnm.vercel.app/install | bash
-source /home/morg1207/.bashrc
+source ~/.bashrc
 fnm use --install-if-missing 20
 node -v
 npm -v
