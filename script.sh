@@ -17,6 +17,6 @@ pip install psutil
 npm install
 
 #npm run build
-
+#cambiar webpage addes en vite config
 #python3 server.py
 #ros2 launch rosbridge_server rosbridge_websocket_launch.xml
