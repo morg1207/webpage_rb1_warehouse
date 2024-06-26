@@ -151,7 +151,7 @@ pre {
 }
 
 .output-container {
-  height: 100px; /* Puedes ajustar la altura según tus necesidades */
+  height: 500px; /* Puedes ajustar la altura según tus necesidades */
   overflow-y: scroll;
   background-color: #f8f8f8;
   padding: 10px;

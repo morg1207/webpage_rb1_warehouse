@@ -58,10 +58,10 @@ export default {
       ros: null,
       showSubButtons: false, // Agregar estado para mostrar los botones cuadrados
       points: [
-        { x: 0, y: 0, z: 0, w: 0, label: "A" },
-        { x: 1, y: 1, z: 0, w: 0, label: "B" },
-        { x: 2, y: 2, z: 0, w: 0, label: "C" },
-        { x: 2, y: 2, z: 0, w: 0, label: "D" },
+        { x: -0.19, y: 1.3, z: 0.708, w: 0.706, label: "A" },
+        { x: -1.987, y: 0.109, z: 1.0, w: 0, label: "B" },
+        { x: -1.9906, y: -1.447, z: 1.0, w: 0, label: "C" },
+        { x: 1.986, y: -1.228, z: -0.695, w: 0.719, label: "D" },
         // Añade más puntos según sea necesario
       ], 
     };
