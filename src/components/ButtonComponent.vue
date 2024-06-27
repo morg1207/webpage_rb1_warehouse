@@ -17,6 +17,10 @@
       <button class="sub-button" @click="handleSubButtonClick('C')">C</button>
       <button class="sub-button" @click="handleSubButtonClick('D')">D</button>
     </div>
+    <!-- Label que se modifica al hacer clic en el botón -->
+    <div v-if="showSubButtons">
+      <p>{{ labelText }}</p>
+    </div>
   </div>
 </template>
 
@@ -64,6 +68,7 @@ export default {
         { x: 1.986, y: -1.228, z: -0.695, w: 0.719, label: "D" },
         // Añade más puntos según sea necesario
       ], 
+      labelText: '', // Nuevo estado para el label
     };
   },
   computed: {
@@ -110,6 +115,7 @@ export default {
       subscribeBtStatus.subscribe((message) => {
         if (message.data === this.buttonPublishBT + '/done') {
           this.state = "active";
+          this.labelText = ""; // Actualiza el texto del label
           this.publishTopicFigureState.publish(new ROSLIB.Message({ data: this.buttonPublishFigure }));
           console.log(`------`)
           console.log(`Publicado figure state  ${this.buttonPublishFigure}`)
@@ -129,6 +135,7 @@ export default {
       this.showSubButtons = false;
       console.log('Close button')
       this.deactivateButton();
+      this.labelText = " "; // Actualiza el texto del label
     },
 
     buttonShowSubButtons(ros){
@@ -146,6 +153,8 @@ export default {
       if (this.state === "active") {
         this.state = "processing";
         this.publishTopic.publish(new ROSLIB.Message({ data: this.buttonPublishBT }));
+        this.labelText = "select a navigation position "; // Actualiza el texto del label
+
       }
     },
     activateButton() {
