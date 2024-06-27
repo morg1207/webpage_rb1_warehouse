@@ -4,7 +4,7 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
-  base: 'https://i-0ff0db19ba20cbe8c.robotigniteacademy.com/0cb5f084-6a48-452c-a23e-26ce4be72f7e/webpage/', // Ajusta esto según tu subdirectorio
+  base: 'https://i-029db135d8e4b81d2.robotigniteacademy.com/742935e8-3664-44ec-978c-1b07a3c4b185/webpage/', // Ajusta esto según tu subdirectorio
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

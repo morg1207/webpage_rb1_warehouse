@@ -69,6 +69,8 @@ export default {
       this.ros = new ROSLIB.Ros({
         url: this.rosbridge_address
       });
+      console.log("Conectando a rosbridge adrees");
+      console.log(this.rosbridge_address);
       this.ros.on("connection", () => {
         console.log("Conectado a ROS");
         this.logs.unshift(`${new Date().toTimeString()} - ¡Conectado!`);

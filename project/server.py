@@ -24,7 +24,7 @@ def read_process_output():
             if line:
                 process_output.append(line.strip())
             else:
-                time.sleep(0.1)
+                time.sleep(0.5)
 
 @app.route('/launch', methods=['POST'])
 def launch_file():
