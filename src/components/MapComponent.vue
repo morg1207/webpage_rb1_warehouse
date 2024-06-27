@@ -343,6 +343,22 @@ export default {
         };
       }
       if(robot_state_figure == 'robot_with_shelf'){
+
+        //borrar shelf
+        const imageSize = 100; // Change this value to scale the image
+        // Draw the robot image with rotation
+
+
+        // Calculate the clear area size based on the image size
+        const clearSize = imageSize + 10;
+
+        // Clear the previous robot image area
+        this.mainContext.clearRect(
+            this.point_last_x_shelf - clearSize / 2,
+            this.point_last_y_shelf - clearSize / 2,
+            clearSize,
+            clearSize
+        );
         if (this.robotWithShelfImage.complete) {
           this.mainContext.save();
           this.mainContext.translate(point_x_index, point_y_index);
@@ -359,6 +375,8 @@ export default {
             this.mainContext.restore();
           };
         }
+        this.point_last_y_shelf = -4;
+        this.point_last_x_shelf = -4;
       }
 
       this.point_last_x_robot = point_x_index;
@@ -400,14 +418,14 @@ export default {
       if (this.shelfImage.complete) {
         this.mainContext.save();
         this.mainContext.translate(point_x_index, point_y_index);
-        this.mainContext.rotate(-angle + Math.PI/2);
+        this.mainContext.rotate(-angle - Math.PI/2);
         this.mainContext.drawImage(this.shelfImage, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
         this.mainContext.restore();
       } else {
         this.shelfImage.onload = () => {
           this.mainContext.save();
           this.mainContext.translate(point_x_index, point_y_index);
-          this.mainContext.rotate(-angle+ Math.PI/2);
+          this.mainContext.rotate(-angle- Math.PI/2);
           this.mainContext.drawImage(this.sehlfImage, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
           this.mainContext.restore();
         };

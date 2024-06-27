@@ -1,6 +1,3 @@
-sudo apt update
-sudo apt install -y curl 
-sudo apt install -y unzip
 
 curl -fsSL https://fnm.vercel.app/install | bash
 source ~/.bashrc
