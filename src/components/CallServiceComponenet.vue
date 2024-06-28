@@ -23,7 +23,7 @@ export default {
   data() {
     return {
       response: null,
-      buttonLabel: "Iniciar archivo de lanzamiento",
+      buttonLabel: "Launch Servers",
       isLaunched: false,
       processOutput: [],
       intervalId: null,
@@ -84,7 +84,7 @@ export default {
         console.log("Launch response:", this.response);
         if (!this.response.error) {
           this.isLaunched = true;
-          this.buttonLabel = "Reiniciar servidores";
+          this.buttonLabel = "Stop Servers";
           this.state = "active";
           this.$emit("my-event-call-service");
           this.startFetchingOutput();
@@ -107,7 +107,7 @@ export default {
         console.log("Stop response:", this.response);
         if (!this.response.error) {
           this.isLaunched = false;
-          this.buttonLabel = "Iniciar archivo de lanzamiento";
+          this.buttonLabel = "Launch Servers";
           this.state = "inactive";
           this.stopFetchingOutput();
         }
